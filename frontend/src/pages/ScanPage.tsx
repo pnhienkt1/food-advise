@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { BarcodeScanner } from '../components/BarcodeScanner'
+import { IngredientLookup } from '../components/IngredientLookup'
 import { ProductSearch } from '../components/ProductSearch'
 import { ProfilePicker } from '../components/ProfilePicker'
 import { Disclaimer } from '../components/ui'
@@ -30,13 +30,19 @@ export function ScanPage() {
         }}
       />
       <ProfilePicker profile={profile} onChange={setProfile} />
-      <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
-        Không quét được barcode?{' '}
-        <Link to="/ocr" className="font-medium text-emerald-700 underline">
-          Chuyển sang OCR thành phần từ ảnh
-        </Link>
-        .
+
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-slate-200" />
+        <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
+          Hoặc quét theo thành phần
+        </span>
+        <span className="h-px flex-1 bg-slate-200" />
       </div>
+      <p className="text-sm text-slate-600">
+        Không có barcode hoặc không quét được? Quét/nhập thành phần để đánh giá song song.
+      </p>
+      <IngredientLookup />
+
       <Disclaimer />
     </div>
   )
