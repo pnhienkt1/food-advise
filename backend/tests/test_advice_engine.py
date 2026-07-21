@@ -89,6 +89,20 @@ def test_age_6_12_nova4_warning():
     assert any(w["rule_id"] in ("young_child_nova4", "age_6_12_high_sodium") for w in warnings)
 
 
+def test_toddler_nova4_is_caution_not_danger():
+    # A NOVA-4 toddler snack should be "limit intake" (caution), not a severe danger label
+    product = _make_product(nova_group=4, nutri_score="c", ingredients_text="gạo, dâu, táo", allergens=None)
+    profile = UserProfile(age_group="age_1_2", goals=["healthy_eating"])
+
+    warnings, _, score = evaluate_rules(product, profile, {})
+
+    assert all(w["severity"] != "danger" for w in warnings)
+    assert score >= 50
+    # Only a single NOVA warning should fire (no double/triple counting)
+    nova_warnings = [w for w in warnings if "nova" in w["rule_id"]]
+    assert len(nova_warnings) == 1
+
+
 def test_newborn_instant_noodle_danger():
     product = _make_product(ingredients_text="Bột mì ăn liền, muối", nova_group=4)
     profile = UserProfile(age_group="newborn")

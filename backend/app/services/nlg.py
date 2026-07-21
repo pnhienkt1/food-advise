@@ -55,6 +55,11 @@ MESSAGES = {
     "age.preschool_nova4": (
         "Nên hạn chế đồ ăn siêu chế biến, ưu tiên thực phẩm tươi cho trẻ."
     ),
+    "age.child_nova4_limit": (
+        "{{ name }} là thực phẩm chế biến dành cho trẻ nhỏ. Có thể dùng như món ăn vặt không "
+        "thường xuyên, nhưng không nên thay thế trái cây tươi hoặc bữa ăn chính. Nếu trẻ ăn "
+        "hằng ngày, nên cân nhắc giảm tần suất."
+    ),
     "age.preschool_sugar": (
         "Đường {{ sugars }}g/100g cao cho trẻ 2-4 tuổi."
     ),
@@ -80,7 +85,9 @@ MESSAGES = {
         "Protein chỉ {{ proteins }}g/100g — thấp cho mục tiêu tăng cơ."
     ),
     "general.nova4": (
-        "{{ name }} là thực phẩm siêu chế biến. Ăn lành mạnh nên ưu tiên thực phẩm tươi, ít chế biến."
+        "{{ name }} có mức độ chế biến cao (NOVA 4). Phù hợp dùng thỉnh thoảng; nên ưu tiên "
+        "thực phẩm tươi, ít chế biến trong bữa ăn hằng ngày. NOVA phản ánh mức độ chế biến, "
+        "không phải mức độ an toàn."
     ),
     "general.nutri_score_low": (
         "Nutri-Score {{ nutri_score | upper }} cho thấy giá trị dinh dưỡng chưa tốt."
