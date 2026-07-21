@@ -26,7 +26,8 @@
 - To expose the running app on a temporary public URL: `cloudflared tunnel --url http://localhost:5173` → prints a `https://<random>.trycloudflare.com` URL. Only the frontend needs to be tunneled (Vite proxies `/api` + `/health` to the backend). `vite.config.ts` already sets `allowedHosts: true` and the backend CORS already allows `*.trycloudflare.com`. The URL is ephemeral (changes each run, tied to the VM session).
 
 ### Data / crawlers
-- DB starts from `python -m app.sync.seed` (~50 demo products). Safe bulk-ish enrichment: `python -m app.sync.import_off` (Open Food Facts API, VN brands/categories) — legal and reliable.
+- `python -m app.sync.seed` inserts ~50 **fictional demo products** (`source="manual"`, shown in the UI as "Dữ liệu demo"). The project is moving away from demo data toward real sources, so prefer populating real data: `python -m app.sync.import_off` (OFF API, quick) or `python -m app.sync.import_off_bulk --download` (OFF CSV dump ~1GB → thousands of VN products). To drop demo rows: delete `Product` where `source == "manual"` (cascades to nutrients/ingredients/additives).
+- `USDA_API_KEY` (optional, free) enables the USDA fallback in `product_lookup.lookup` (order: DB → Open Food Facts → USDA) for imported/branded GTINs. There is no bulk USDA importer; it enriches unknown barcodes at lookup time.
 - Retailer crawlers `import_bigc` / `import_aeon` are best-effort and currently return 0 (BigC/GO `sitemap.xml` responds 302; AEON's index uses `sitemap-products.xml` naming that the crawler's `sitemap_products` filter does not match). `import_bachhoaxanh` / `import_teko` need specific product-ids/SKUs + store/terminal codes and are considered ToS-risky.
 
 ### Key API endpoints (beyond README)
