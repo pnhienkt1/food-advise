@@ -90,7 +90,8 @@ async def evaluate_advice(request: AdviceRequest, db: Session = Depends(get_db))
 
 @router.post("/evaluate-ingredients", response_model=AdviceOut)
 async def evaluate_ingredients_advice(request: IngredientsAdviceRequest):
-    ingredients = [p.strip() for p in request.ingredients_text.replace(";", ",").split(",") if p.strip()]
+    normalized_text = request.ingredients_text.replace(";", ",").replace("\n", ",")
+    ingredients = [p.strip() for p in normalized_text.split(",") if p.strip()]
     pseudo_product = ProductOut(
         barcode="ocr-upload",
         name="Sản phẩm từ OCR",

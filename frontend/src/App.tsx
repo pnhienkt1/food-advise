@@ -26,7 +26,7 @@ function Layout({ children }: { children: React.ReactNode }) {
               Gợi ý
             </Link>
             <Link to="/ocr" className="text-slate-600 hover:text-emerald-600">
-              OCR
+              Thành phần
             </Link>
             <Link to="/history" className="text-slate-600 hover:text-emerald-600">
               Lịch sử
