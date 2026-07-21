@@ -31,7 +31,8 @@
 - Retailer crawlers `import_bigc` / `import_aeon` are best-effort and currently return 0 (BigC/GO `sitemap.xml` responds 302; AEON's index uses `sitemap-products.xml` naming that the crawler's `sitemap_products` filter does not match). `import_bachhoaxanh` / `import_teko` need specific product-ids/SKUs + store/terminal codes and are considered ToS-risky.
 
 ### Key API endpoints (beyond README)
-- `GET /api/v1/products?q=<name>&ingredient=<thành phần>&limit=&offset=` — list/manage all products, filter by name/brand and/or ingredient (powers the `/products` management page).
+- `GET /api/v1/products?q=<name>&ingredient=<thành phần>&limit=&offset=` — list/manage all products, filter by name/brand and/or ingredient/additive. Matching is **accent-insensitive on SQLite** via a registered `unaccent()` function (`app/core/database.py`); the ingredient filter also matches the `product_additives` table (E-numbers + names).
+- `POST /api/v1/advice/evaluate-ingredients` — evaluates free ingredient text (OCR/manual). It parses additives from the text via `app/core/additives_kb.py` (so additive rules fire) and accepts optional per-100g nutrients (`sugars`, `salt`, `sodium`, `saturated_fat`, `energy_kcal`, `proteins`) for deeper scoring. Additive names/risk levels are enriched from the same KB (`_additive_to_schema` in `product_lookup.py`).
 
 ### Lint / test / build
 - Backend tests: from `backend/`, `.venv/bin/pytest`.
