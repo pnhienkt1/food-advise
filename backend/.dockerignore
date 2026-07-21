@@ -1,0 +1,25 @@
+# Giảm build context (đặc biệt loại data dump ~1GB và venv)
+.venv/
+venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# CSDL & dữ liệu cục bộ
+*.db
+*.sqlite3
+data/
+
+# Môi trường & log
+.env
+*.log
+
+# VCS & meta
+.git/
+.gitignore
+Dockerfile
+.dockerignore

@@ -1,0 +1,54 @@
+# Giảm payload/token: loại các thư mục/tập tin lớn, sinh tự động, hoặc nhị phân khỏi index của Cursor
+
+# Dependencies
+node_modules/
+**/node_modules/
+.venv/
+**/.venv/
+venv/
+
+# Python caches & build artifacts
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Frontend build output
+dist/
+**/dist/
+build/
+
+# Lockfiles (lớn, sinh tự động)
+package-lock.json
+**/package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# CSDL & dữ liệu cục bộ lớn
+*.db
+*.sqlite3
+backend/data/
+**/*.csv
+**/*.csv.gz
+
+# Môi trường & log
+.env
+*.log
+
+# Ảnh/video nhị phân (không phải token văn bản)
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.mp4
+*.mov
+
+# Khác
+.DS_Store
+coverage/
+htmlcov/
+.coverage
