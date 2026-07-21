@@ -1,0 +1,338 @@
+# Diabetes rules
+- id: diabetes_high_sugar
+  conditions:
+    profile.conditions: [diabetes]
+    nutrient.sugars: { gt: 10 }
+  severity: warning
+  score_impact: -30
+  message_key: diabetes.high_sugar
+  title: "Hàm lượng đường cao"
+  evidence: "WHO khuyến nghị hạn chế đường tự do dưới 10% tổng năng lượng"
+
+- id: diabetes_nova4
+  conditions:
+    profile.conditions: [diabetes]
+    product.nova_group: { eq: 4 }
+  severity: caution
+  score_impact: -15
+  message_key: diabetes.nova4
+  title: "Thực phẩm siêu chế biến"
+  evidence: "NOVA nhóm 4 thường chứa nhiều đường và chất béo bão hòa"
+
+# Hypertension rules
+- id: hypertension_high_sodium
+  conditions:
+    profile.conditions: [hypertension]
+    nutrient.sodium: { gt: 600 }
+  severity: warning
+  score_impact: -30
+  message_key: hypertension.high_sodium
+  title: "Hàm lượng natri cao"
+  evidence: "WHO khuyến nghị ăn dưới 5g muối/ngày (<2000mg natri)"
+
+- id: hypertension_high_salt
+  conditions:
+    profile.conditions: [hypertension]
+    nutrient.salt: { gt: 1.5 }
+  severity: warning
+  score_impact: -25
+  message_key: hypertension.high_salt
+  title: "Hàm lượng muối cao"
+  evidence: "Người cao huyết áp nên hạn chế muối"
+
+# Gout rules
+- id: gout_high_protein
+  conditions:
+    profile.conditions: [gout]
+    nutrient.proteins: { gt: 15 }
+  severity: caution
+  score_impact: -15
+  message_key: gout.high_protein
+  title: "Protein cao"
+  evidence: "Người bị gout nên hạn chế purin từ protein động vật"
+
+# Kidney disease
+- id: kidney_high_sodium
+  conditions:
+    profile.conditions: [kidney]
+    nutrient.sodium: { gt: 400 }
+  severity: warning
+  score_impact: -25
+  message_key: kidney.high_sodium
+  title: "Natri cao - không phù hợp bệnh thận"
+  evidence: "Bệnh nhân thận cần hạn chế natri nghiêm ngặt"
+
+- id: kidney_high_protein
+  conditions:
+    profile.conditions: [kidney]
+    nutrient.proteins: { gt: 20 }
+  severity: caution
+  score_impact: -15
+  message_key: kidney.high_protein
+  title: "Protein cao"
+  evidence: "Bệnh thận mạn cần kiểm soát lượng protein"
+
+# Celiac
+- id: celiac_gluten
+  conditions:
+    profile.conditions: [celiac]
+    ingredients.contains: [gluten, lúa mì, wheat, mì]
+  severity: danger
+  score_impact: -50
+  message_key: celiac.gluten
+  title: "Có thể chứa gluten"
+  evidence: "Người celiac cần tránh hoàn toàn gluten"
+
+# Allergen rules
+- id: allergen_match
+  conditions:
+    profile.allergens: { not_empty: true }
+    allergens.match: true
+  severity: danger
+  score_impact: -50
+  message_key: allergen.match
+  title: "Chất gây dị ứng"
+  evidence: "Sản phẩm có thể chứa chất bạn dị ứng"
+
+# Age group rules — trẻ sơ sinh & trẻ nhỏ
+- id: newborn_not_suitable
+  conditions:
+    profile.age_group: [newborn]
+    product.nova_group: { gte: 2 }
+  severity: danger
+  score_impact: -50
+  message_key: age.newborn_processed
+  title: "Không phù hợp trẻ sơ sinh"
+  evidence: "WHO/UNICEF: trẻ 0-12 tháng chỉ nên dùng sữa mẹ hoặc công thức theo chỉ định bác sĩ"
+
+- id: newborn_honey
+  conditions:
+    profile.age_group: [newborn, age_1_2]
+    ingredients.contains: [mật ong, honey, miel]
+  severity: danger
+  score_impact: -50
+  message_key: age.honey
+  title: "Không được dùng mật ong"
+  evidence: "AAP/WHO: tránh mật ong dưới 12 tháng tuổi (nguy cơ botulism)"
+
+- id: newborn_high_sodium
+  conditions:
+    profile.age_group: [newborn]
+    nutrient.sodium: { gt: 100 }
+  severity: danger
+  score_impact: -40
+  message_key: age.newborn_sodium
+  title: "Natri quá cao cho trẻ sơ sinh"
+  evidence: "Thận trẻ sơ sinh chưa trưởng thành, cần hạn chế muối nghiêm ngặt"
+
+- id: age_1_2_nova4
+  conditions:
+    profile.age_group: [age_1_2]
+    product.nova_group: { eq: 4 }
+  severity: danger
+  score_impact: -40
+  message_key: age.toddler_nova4
+  title: "Không khuyến khích cho trẻ 1-2 tuổi"
+  evidence: "Hướng dẫn dinh dưỡng trẻ nhỏ: hạn chế thực phẩm siêu chế biến"
+
+- id: age_1_2_high_sodium
+  conditions:
+    profile.age_group: [age_1_2]
+    nutrient.sodium: { gt: 300 }
+  severity: warning
+  score_impact: -25
+  message_key: age.toddler_sodium
+  title: "Natri cao cho trẻ 1-2 tuổi"
+  evidence: "Nhu cầu natri trẻ nhỏ thấp hơn người lớn nhiều lần"
+
+- id: age_2_4_nova4
+  conditions:
+    profile.age_group: [age_2_4]
+    product.nova_group: { eq: 4 }
+  severity: warning
+  score_impact: -25
+  message_key: age.preschool_nova4
+  title: "Hạn chế đồ ăn vặt siêu chế biến"
+  evidence: "Trẻ mầm non nên ăn thực phẩm tươi, ít chế biến"
+
+- id: age_2_4_high_sugar
+  conditions:
+    profile.age_group: [age_2_4]
+    nutrient.sugars: { gt: 8 }
+  severity: warning
+  score_impact: -20
+  message_key: age.preschool_sugar
+  title: "Đường cao cho trẻ 2-4 tuổi"
+  evidence: "WHO khuyến nghị hạn chế đường tự do ở trẻ em"
+
+- id: age_4_6_nova4
+  conditions:
+    profile.age_group: [age_4_6]
+    product.nova_group: { eq: 4 }
+  severity: caution
+  score_impact: -20
+  message_key: age.preschool_nova4
+  title: "Hạn chế đồ ăn vặt siêu chế biến"
+  evidence: "Trẻ mầm non nên ăn thực phẩm tươi, ít chế biến"
+
+- id: age_4_6_high_sodium
+  conditions:
+    profile.age_group: [age_4_6]
+    nutrient.sodium: { gt: 500 }
+  severity: warning
+  score_impact: -20
+  message_key: age.child_sodium
+  title: "Natri cao cho trẻ 4-6 tuổi"
+  evidence: "Trẻ em cần hạn chế muối hơn người lớn"
+
+- id: age_6_12_high_sodium
+  conditions:
+    profile.age_group: [age_6_12]
+    nutrient.sodium: { gt: 600 }
+  severity: warning
+  score_impact: -20
+  message_key: age.child_sodium
+  title: "Natri cao cho trẻ 6-12 tuổi"
+  evidence: "Trẻ em cần hạn chế muối hơn người lớn"
+
+- id: young_child_nova4
+  conditions:
+    profile.age_group: [age_1_2, age_2_4, age_4_6, age_6_12]
+    product.nova_group: { eq: 4 }
+  severity: caution
+  score_impact: -15
+  message_key: age.child_nova4
+  title: "Thực phẩm siêu chế biến"
+  evidence: "Thực phẩm siêu chế biến không phù hợp chế độ ăn trẻ em"
+
+- id: young_child_instant_noodles
+  conditions:
+    profile.age_group: [newborn, age_1_2, age_2_4, age_4_6]
+    ingredients.contains: [mì ăn liền, instant noodle, mì gói]
+  severity: warning
+  score_impact: -25
+  message_key: age.no_instant_noodles
+  title: "Mì ăn liền không phù hợp độ tuổi"
+  evidence: "Mì gói thường nhiều muối, MSG — không phù hợp trẻ nhỏ"
+
+- id: pregnant_msg
+  conditions:
+    profile.age_group: [pregnant]
+    additives.contains: [E621, E250, E251]
+  severity: caution
+  score_impact: -15
+  message_key: age.pregnant_additives
+  title: "Phụ gia cần lưu ý khi mang thai"
+  evidence: "Phụ nữ mang thai nên hạn chế MSG và nitrite"
+
+# Nutrition goals
+- id: goal_weight_loss_high_cal
+  conditions:
+    profile.goals: [weight_loss]
+    nutrient.energy_kcal: { gt: 400 }
+  severity: caution
+  score_impact: -15
+  message_key: goal.weight_loss_cal
+  title: "Năng lượng cao"
+  evidence: "Giảm cân nên chọn thực phẩm ít calo hơn"
+
+- id: goal_low_sugar
+  conditions:
+    profile.goals: [low_sugar]
+    nutrient.sugars: { gt: 5 }
+  severity: warning
+  score_impact: -20
+  message_key: goal.low_sugar
+  title: "Đường cao hơn mục tiêu"
+  evidence: "Mục tiêu hạn chế đường: nên chọn sản phẩm dưới 5g/100g"
+
+- id: goal_low_sodium
+  conditions:
+    profile.goals: [low_sodium]
+    nutrient.sodium: { gt: 300 }
+  severity: warning
+  score_impact: -20
+  message_key: goal.low_sodium
+  title: "Natri cao hơn mục tiêu"
+  evidence: "Mục tiêu ăn ít muối: nên chọn dưới 300mg natri/100g"
+
+- id: goal_low_sat_fat
+  conditions:
+    profile.goals: [low_sat_fat]
+    nutrient.saturated_fat: { gt: 5 }
+  severity: warning
+  score_impact: -20
+  message_key: goal.low_sat_fat
+  title: "Chất béo bão hòa cao"
+  evidence: "Nên hạn chế chất béo bão hòa dưới 5g/100g"
+
+- id: goal_muscle_gain_low_protein
+  conditions:
+    profile.goals: [muscle_gain]
+    nutrient.proteins: { lt: 10 }
+  severity: info
+  score_impact: -10
+  message_key: goal.muscle_low_protein
+  title: "Protein thấp cho mục tiêu tăng cơ"
+  evidence: "Tăng cơ nên chọn thực phẩm giàu protein (>10g/100g)"
+
+# General health rules
+- id: nova4_general
+  conditions:
+    profile.goals: [healthy_eating]
+    product.nova_group: { eq: 4 }
+  severity: caution
+  score_impact: -20
+  message_key: general.nova4
+  title: "Thực phẩm siêu chế biến (NOVA 4)"
+  evidence: "Ăn lành mạnh nên ưu tiên thực phẩm ít chế biến"
+
+- id: nutri_score_d
+  conditions:
+    profile.goals: [healthy_eating]
+    product.nutri_score: [d, e]
+  severity: caution
+  score_impact: -15
+  message_key: general.nutri_score_low
+  title: "Nutri-Score thấp"
+  evidence: "Nutri-Score D/E cho thấy giá trị dinh dưỡng kém"
+
+- id: msg_additive
+  conditions:
+    additives.contains: [E621]
+  severity: info
+  score_impact: -5
+  message_key: general.msg
+  title: "Chứa MSG (E621)"
+  evidence: "Một số người nhạy cảm với glutamate"
+
+# Positive rules
+- id: positive_nutri_score_ab
+  conditions:
+    product.nutri_score: [a, b]
+  severity: info
+  score_impact: 15
+  message_key: positive.nutri_score
+  title: "Nutri-Score tốt"
+  evidence: "Nutri-Score A/B là lựa chọn dinh dưỡng tốt"
+  positive: true
+
+- id: positive_high_fiber
+  conditions:
+    nutrient.fiber: { gt: 3 }
+  severity: info
+  score_impact: 10
+  message_key: positive.fiber
+  title: "Giàu chất xơ"
+  evidence: "Chất xơ tốt cho tiêu hóa"
+  positive: true
+
+- id: positive_nova1
+  conditions:
+    product.nova_group: { eq: 1 }
+  severity: info
+  score_impact: 15
+  message_key: positive.nova1
+  title: "Thực phẩm chưa chế biến"
+  evidence: "NOVA nhóm 1 là lựa chọn lành mạnh nhất"
+  positive: true
