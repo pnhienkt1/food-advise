@@ -2,6 +2,10 @@
 
 ## Cursor Cloud specific instructions
 
+### Working preferences (token/payload budget)
+- The user prioritizes low token/payload usage. Do NOT auto-run extra verification after finishing a task unless explicitly asked: skip screenshots, GUI/computer-use walkthroughs, screen recordings, and running the automated test suite. Prefer a quick lint/build/type check when confidence is needed, and describe changes in text instead of capturing media. (User can add `/no-test` to explicitly skip testing.)
+- Keep context small: `.cursorignore` excludes large/generated files (node_modules, `.venv`, `dist`, `package-lock.json`, `backend/data/`, `*.db`, media). `.dockerignore` files trim Docker build context per service (notably `backend/data/` and `.venv`).
+
 ### Services
 - **Backend** — FastAPI (`backend/app/main.py`), served on port `8001`.
 - **Frontend** — React + Vite SPA (`frontend/`), dev server on port `5173`. Vite proxies `/api` and `/health` to `http://127.0.0.1:8001`, so both services must run together.
