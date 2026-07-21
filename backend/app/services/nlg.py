@@ -107,6 +107,15 @@ SUMMARY_TEMPLATES = {
     "danger": "{{ name }} có cảnh báo nghiêm trọng! Không khuyến khích sử dụng với profile hiện tại.",
 }
 
+# Câu tóm tắt khi KHÔNG có cảnh báo nào — tránh nhắc tới "điểm bên dưới" gây hiểu nhầm
+SUMMARY_TEMPLATES_NO_WARNINGS = {
+    "excellent": "{{ name }} phù hợp tốt với profile sức khỏe của bạn ({{ score }}/100).",
+    "good": "{{ name }} khá phù hợp với profile sức khỏe của bạn ({{ score }}/100), không phát hiện cảnh báo nào.",
+    "moderate": "{{ name }} có mức độ phù hợp trung bình ({{ score }}/100).",
+    "poor": "{{ name }} không phù hợp với profile của bạn ({{ score }}/100). Nên tìm sản phẩm thay thế.",
+    "danger": "{{ name }} có cảnh báo nghiêm trọng! Không khuyến khích sử dụng với profile hiện tại.",
+}
+
 POSITIVE_MESSAGES = {
     "positive.nutri_score": "Nutri-Score {{ nutri_score | upper }} — dinh dưỡng tốt",
     "positive.fiber": "Giàu chất xơ ({{ fiber }}g/100g)",
