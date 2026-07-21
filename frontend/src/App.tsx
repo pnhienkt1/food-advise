@@ -3,6 +3,7 @@ import { HistoryPage } from './pages/HistoryPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { ResultPage } from './pages/ResultPage'
 import { RecommendPage } from './pages/RecommendPage'
+import { ComparePage } from './pages/ComparePage'
 import { OcrPage } from './pages/OcrPage'
 import { ProductsPage } from './pages/ProductsPage'
 import { ScanPage } from './pages/ScanPage'
@@ -22,6 +23,9 @@ function Layout({ children }: { children: React.ReactNode }) {
             </Link>
             <Link to="/products" className="text-slate-600 hover:text-emerald-600">
               Sản phẩm
+            </Link>
+            <Link to="/compare" className="text-slate-600 hover:text-emerald-600">
+              So sánh
             </Link>
             <Link to="/profile" className="text-slate-600 hover:text-emerald-600">
               Hồ sơ
@@ -50,6 +54,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/scan" replace />} />
         <Route path="/scan" element={<ScanPage />} />
         <Route path="/products" element={<ProductsPage />} />
+        <Route path="/compare" element={<ComparePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/result/:barcode" element={<ResultPage />} />
         <Route path="/recommend" element={<RecommendPage />} />

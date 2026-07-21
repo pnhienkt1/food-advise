@@ -61,10 +61,23 @@ export function getProfilePresets(): Promise<ProfilePreset[]> {
   return request('/api/v1/profiles/presets')
 }
 
-export function evaluateIngredientsAdvice(ingredientsText: string, profile: UserProfile): Promise<Advice> {
+export interface QuickNutrients {
+  sugars?: number
+  salt?: number
+  sodium?: number
+  saturated_fat?: number
+  energy_kcal?: number
+  proteins?: number
+}
+
+export function evaluateIngredientsAdvice(
+  ingredientsText: string,
+  profile: UserProfile,
+  nutrients?: QuickNutrients,
+): Promise<Advice> {
   return request('/api/v1/advice/evaluate-ingredients', {
     method: 'POST',
-    body: JSON.stringify({ ingredients_text: ingredientsText, profile }),
+    body: JSON.stringify({ ingredients_text: ingredientsText, profile, ...(nutrients ?? {}) }),
   })
 }
 

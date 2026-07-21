@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import type { QuickNutrients } from '../api/client'
 import { evaluateIngredientsAdvice, uploadIngredientsImage } from '../api/client'
 import { AdvicePanel } from '../components/AdvicePanel'
-import { Disclaimer } from '../components/ui'
+import { AdditiveBadge, Disclaimer } from '../components/ui'
 import { useProfile } from '../hooks/useProfile'
 import type { Advice, OcrIngredientsResult } from '../types'
 
 export function OcrPage() {
   const { profile } = useProfile()
   const [ingredientsText, setIngredientsText] = useState('')
+  const [sugars, setSugars] = useState('')
+  const [salt, setSalt] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [ocr, setOcr] = useState<OcrIngredientsResult | null>(null)
   const [advice, setAdvice] = useState<Advice | null>(null)
@@ -44,7 +47,12 @@ export function OcrPage() {
     setLoading(true)
     setError(null)
     try {
-      const result = await evaluateIngredientsAdvice(ingredientsText, profile)
+      const nutrients: QuickNutrients = {}
+      const s = parseFloat(sugars.replace(',', '.'))
+      const m = parseFloat(salt.replace(',', '.'))
+      if (!Number.isNaN(s)) nutrients.sugars = s
+      if (!Number.isNaN(m)) nutrients.salt = m
+      const result = await evaluateIngredientsAdvice(ingredientsText, profile, nutrients)
       setAdvice(result)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Đánh giá thất bại')
@@ -68,6 +76,41 @@ export function OcrPage() {
           placeholder="VD: đường, muối, bột mì, dầu cọ, chất bảo quản, bột ngọt (E621)..."
           className="mt-4 block w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-800 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
         />
+        <details className="mt-3 rounded-xl bg-slate-50 p-3">
+          <summary className="cursor-pointer text-sm font-medium text-slate-700">
+            Đánh giá sâu hơn (tùy chọn): nhập số liệu dinh dưỡng
+          </summary>
+          <p className="mt-2 text-xs text-slate-500">
+            Vì chỉ có thành phần nên hệ thống thiếu số liệu dinh dưỡng. Nhập nhanh để có cảnh báo chính
+            xác hơn theo hồ sơ.
+          </p>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            <label className="text-sm text-slate-700">
+              Đường (g/100g)
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={sugars}
+                onChange={(e) => setSugars(e.target.value)}
+                placeholder="VD: 20"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              />
+            </label>
+            <label className="text-sm text-slate-700">
+              Muối (g/100g)
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={salt}
+                onChange={(e) => setSalt(e.target.value)}
+                placeholder="VD: 1.5"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              />
+            </label>
+          </div>
+        </details>
         <button
           onClick={runAdvice}
           disabled={!canEvaluate || loading}
@@ -121,7 +164,21 @@ export function OcrPage() {
 
       {error && <p className="text-sm text-red-700">{error}</p>}
 
-      {advice && <AdvicePanel advice={advice} />}
+      {advice && (
+        <>
+          <AdvicePanel advice={advice} />
+          {advice.additives.length > 0 && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h3 className="font-semibold text-slate-900">Phụ gia phát hiện trong thành phần</h3>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {advice.additives.map((a) => (
+                  <AdditiveBadge key={a.e_number} eNumber={a.e_number} name={a.name} risk={a.risk_level} />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
       <Disclaimer />
       <Link to="/scan" className="inline-block text-sm text-emerald-700 hover:underline">
