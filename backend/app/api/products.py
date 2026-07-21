@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
+from app.core.database import IS_SQLITE, get_db, strip_diacritics
 from app.models.product import Product, ProductAdditive, ProductIngredient
 from app.schemas.product import (
     AdviceOut,
@@ -18,6 +18,16 @@ from app.services.product_lookup import ProductLookupService, _product_to_schema
 from app.services.product_search import ProductSearchService
 
 router = APIRouter(prefix="/products", tags=["products"])
+
+
+def _accent_insensitive(column, term: str) -> list:
+    """Build LIKE conditions for `term` on `column`, accent-insensitive on SQLite."""
+    cleaned = term.strip().lower()
+    conditions = [func.lower(column).like(f"%{cleaned}%")]
+    if IS_SQLITE:
+        stripped = strip_diacritics(cleaned)
+        conditions.append(func.unaccent(func.lower(column)).like(f"%{stripped}%"))
+    return conditions
 
 
 @router.get("/search", response_model=list[ProductSearchResult])
@@ -40,26 +50,24 @@ def list_products(
     query = db.query(Product)
 
     if q and q.strip():
-        like = f"%{q.strip()}%"
-        query = query.filter(or_(Product.name.ilike(like), Product.brand.ilike(like)))
+        query = query.filter(or_(*_accent_insensitive(Product.name, q), *_accent_insensitive(Product.brand, q)))
 
     if ingredient and ingredient.strip():
-        ing = f"%{ingredient.strip().lower()}%"
         matching_ingredients = db.query(ProductIngredient.barcode).filter(
-            func.lower(ProductIngredient.normalized_name).like(ing)
+            or_(*_accent_insensitive(ProductIngredient.normalized_name, ingredient))
         )
         # Phụ gia (E-number) được lưu ở bảng riêng nên phải tra cả e_number và tên phụ gia
         matching_additives = db.query(ProductAdditive.barcode).filter(
             or_(
-                func.lower(ProductAdditive.e_number).like(ing),
-                func.lower(ProductAdditive.name).like(ing),
+                func.lower(ProductAdditive.e_number).like(f"%{ingredient.strip().lower()}%"),
+                *_accent_insensitive(ProductAdditive.name, ingredient),
             )
         )
         query = query.filter(
             or_(
                 Product.barcode.in_(matching_ingredients),
                 Product.barcode.in_(matching_additives),
-                func.lower(Product.ingredients_text).like(ing),
+                *_accent_insensitive(Product.ingredients_text, ingredient),
             )
         )
 

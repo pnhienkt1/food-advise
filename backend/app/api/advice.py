@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.core.additives_kb import extract_additives_from_text
 from app.core.database import get_db
 from app.schemas.product import (
+    AdditiveOut,
     AdviceOut,
     AdviceRequest,
     IngredientsAdviceRequest,
+    NutrientOut,
     ProductOut,
     ProfilePreset,
     UserProfile,
@@ -92,9 +95,34 @@ async def evaluate_advice(request: AdviceRequest, db: Session = Depends(get_db))
 async def evaluate_ingredients_advice(request: IngredientsAdviceRequest):
     normalized_text = request.ingredients_text.replace(";", ",").replace("\n", ",")
     ingredients = [p.strip() for p in normalized_text.split(",") if p.strip()]
+
+    # Nhận diện phụ gia (E-number + tên thông dụng) ngay từ text để rule phụ gia có thể kích hoạt
+    detected = extract_additives_from_text(request.ingredients_text)
+    additives = [
+        AdditiveOut(e_number=a["e_number"], name=a["name"], risk_level=a["risk"]) for a in detected
+    ]
+
+    # Số liệu dinh dưỡng tùy chọn: cho phép đánh giá sâu hơn (rule dinh dưỡng)
+    nutrients: dict[str, float] = {}
+    if request.sugars is not None:
+        nutrients["sugars"] = request.sugars
+    if request.saturated_fat is not None:
+        nutrients["saturated_fat"] = request.saturated_fat
+    if request.energy_kcal is not None:
+        nutrients["energy_kcal"] = request.energy_kcal
+    if request.proteins is not None:
+        nutrients["proteins"] = request.proteins
+    if request.sodium is not None:
+        nutrients["sodium"] = request.sodium
+        nutrients.setdefault("salt", round(request.sodium / 400.0, 3))
+    if request.salt is not None:
+        nutrients["salt"] = request.salt
+        # 1g muối ≈ 400mg natri
+        nutrients.setdefault("sodium", round(request.salt * 400.0, 1))
+
     pseudo_product = ProductOut(
         barcode="ocr-upload",
-        name="Sản phẩm từ OCR",
+        name="Sản phẩm từ thành phần",
         brand=None,
         category=None,
         source="ocr",
@@ -104,19 +132,22 @@ async def evaluate_ingredients_advice(request: IngredientsAdviceRequest):
         allergens=None,
         nutri_score=None,
         nova_group=None,
-        nutrients=[],
+        nutrients=[
+            NutrientOut(nutrient_code=code, amount=amount, unit=None) for code, amount in nutrients.items()
+        ],
         ingredients=[{"position": idx, "name": item} for idx, item in enumerate(ingredients)],
-        additives=[],
+        additives=additives,
         alerts=[],
     )
     engine = AdviceEngine()
-    result = engine.evaluate(pseudo_product, request.profile, nutrients={})
+    result = engine.evaluate(pseudo_product, request.profile, nutrients=nutrients)
     return AdviceOut(
         barcode="ocr-upload",
-        product_name="Sản phẩm từ OCR",
+        product_name="Sản phẩm từ thành phần",
         suitability_score=result["suitability_score"],
         suitability_label=result["suitability_label"],
         summary=result["summary"],
         warnings=result["warnings"],
         positives=result["positives"],
+        additives=additives,
     )

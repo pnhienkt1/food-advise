@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import httpx
 from sqlalchemy.orm import Session
 
+from app.core.additives_kb import get_additive_info
 from app.core.cache import cache_get, cache_set
 from app.core.config import settings
 from app.core.constants import NUTRIENT_LABELS, NUTRIENT_OFF_MAP, USDA_NUTRIENT_MAP
@@ -32,6 +33,21 @@ def _parse_off_additives(additives_tags: list[str] | None) -> list[tuple[str, st
         if match:
             result.append((match.group(1).upper(), tag.replace("en:", "").replace("-", " ").title()))
     return result
+
+
+def _additive_to_schema(additive: ProductAdditive) -> AdditiveOut:
+    """Enrich name/risk from the additive KB when the stored row lacks them."""
+    info = get_additive_info(additive.e_number) or {}
+    stored_name = (additive.name or "").strip()
+    # OFF bulk stores the E-number itself as the name — treat that as uninformative
+    enumber_norm = (additive.e_number or "").upper().replace(" ", "")
+    uninformative = not stored_name or stored_name.upper().replace(" ", "") == enumber_norm
+    name = info.get("name") if (uninformative and info.get("name")) else (stored_name or info.get("name"))
+    return AdditiveOut(
+        e_number=additive.e_number,
+        name=name,
+        risk_level=additive.risk_level or info.get("risk"),
+    )
 
 
 def _parse_ingredients(text: str | None) -> list[tuple[int, str]]:
@@ -65,10 +81,7 @@ def _product_to_schema(product: Product) -> ProductOut:
         nova_group=product.nova_group,
         nutrients=nutrients,
         ingredients=[IngredientOut(position=i.position, name=i.name) for i in product.ingredients],
-        additives=[
-            AdditiveOut(e_number=a.e_number, name=a.name, risk_level=a.risk_level)
-            for a in product.additives
-        ],
+        additives=[_additive_to_schema(a) for a in product.additives],
         alerts=[
             AlertOut(alert_type=a.alert_type, message=a.message, source_url=a.source_url)
             for a in product.alerts
