@@ -24,12 +24,38 @@ OFF_SEARCH = f"{settings.off_api_url}/api/v2/search"
 OFF_SEARCH_LEGACY = f"{settings.off_api_url}/cgi/search.pl"
 HEADERS = {"User-Agent": "FoodAdvise/1.0 (research demo; contact: local)"}
 
+VN_BRANDS = [
+    "acecook",
+    "vifon",
+    "masan",
+    "vinamilk",
+    "th-true-milk",
+    "vinasoy",
+    "kinh-do",
+    "pepsico",
+    "coca-cola",
+    "unilever",
+    "nestle",
+    "sabeco",
+    "tan-hiep-phat",
+    "bibica",
+    "trung-nguyen",
+    "orion",
+]
+
+VN_CATEGORIES = [
+    "instant-noodles",
+    "sauces",
+    "snacks",
+    "beverages",
+    "dairies",
+]
+
 SEARCH_QUERIES = [
     {"tagtype_0": "countries", "tag_contains_0": "contains", "tag_0": "en:vietnam"},
     {"tagtype_0": "countries", "tag_contains_0": "contains", "tag_0": "vietnam"},
-    {"tagtype_1": "brands", "tag_contains_1": "contains", "tag_1": "acecook"},
-    {"tagtype_1": "brands", "tag_contains_1": "contains", "tag_1": "vinamilk"},
-    {"tagtype_1": "categories", "tag_contains_1": "contains", "tag_1": "instant-noodles"},
+    *[{"tagtype_1": "brands", "tag_contains_1": "contains", "tag_1": brand} for brand in VN_BRANDS],
+    *[{"tagtype_1": "categories", "tag_contains_1": "contains", "tag_1": cat} for cat in VN_CATEGORIES],
 ]
 
 
