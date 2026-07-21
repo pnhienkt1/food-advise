@@ -3,7 +3,7 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.models.product import Product, ProductIngredient
+from app.models.product import Product, ProductAdditive, ProductIngredient
 from app.schemas.product import (
     AdviceOut,
     AdviceRequest,
@@ -45,12 +45,20 @@ def list_products(
 
     if ingredient and ingredient.strip():
         ing = f"%{ingredient.strip().lower()}%"
-        matching_barcodes = db.query(ProductIngredient.barcode).filter(
+        matching_ingredients = db.query(ProductIngredient.barcode).filter(
             func.lower(ProductIngredient.normalized_name).like(ing)
+        )
+        # Phụ gia (E-number) được lưu ở bảng riêng nên phải tra cả e_number và tên phụ gia
+        matching_additives = db.query(ProductAdditive.barcode).filter(
+            or_(
+                func.lower(ProductAdditive.e_number).like(ing),
+                func.lower(ProductAdditive.name).like(ing),
+            )
         )
         query = query.filter(
             or_(
-                Product.barcode.in_(matching_barcodes),
+                Product.barcode.in_(matching_ingredients),
+                Product.barcode.in_(matching_additives),
                 func.lower(Product.ingredients_text).like(ing),
             )
         )

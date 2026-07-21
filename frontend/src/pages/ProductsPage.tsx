@@ -105,14 +105,14 @@ export function ProductsPage() {
           </div>
           <div>
             <label htmlFor="ing-q" className="block text-sm font-medium text-slate-700">
-              Tìm theo thành phần
+              Tìm theo thành phần / phụ gia
             </label>
             <input
               id="ing-q"
               type="search"
               value={ingredientQuery}
               onChange={(e) => setIngredientQuery(e.target.value)}
-              placeholder="VD: đường, muối, dầu cọ..."
+              placeholder="VD: đường, muối, E621, chất bảo quản..."
               autoComplete="off"
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
