@@ -129,11 +129,11 @@
   conditions:
     profile.age_group: [age_1_2]
     product.nova_group: { eq: 4 }
-  severity: danger
-  score_impact: -40
-  message_key: age.toddler_nova4
-  title: "Không khuyến khích cho trẻ 1-2 tuổi"
-  evidence: "Hướng dẫn dinh dưỡng trẻ nhỏ: hạn chế thực phẩm siêu chế biến"
+  severity: caution
+  score_impact: -15
+  message_key: age.child_nova4_limit
+  title: "Nên hạn chế thực phẩm chế biến"
+  evidence: "NOVA phản ánh mức độ chế biến, không phải mức độ an toàn; ưu tiên thực phẩm tươi cho bữa chính"
 
 - id: age_1_2_high_sodium
   conditions:
@@ -149,11 +149,11 @@
   conditions:
     profile.age_group: [age_2_4]
     product.nova_group: { eq: 4 }
-  severity: warning
-  score_impact: -25
-  message_key: age.preschool_nova4
-  title: "Hạn chế đồ ăn vặt siêu chế biến"
-  evidence: "Trẻ mầm non nên ăn thực phẩm tươi, ít chế biến"
+  severity: caution
+  score_impact: -15
+  message_key: age.child_nova4_limit
+  title: "Nên hạn chế thực phẩm chế biến"
+  evidence: "NOVA phản ánh mức độ chế biến, không phải mức độ an toàn; ưu tiên thực phẩm tươi cho bữa chính"
 
 - id: age_2_4_high_sugar
   conditions:
@@ -170,10 +170,10 @@
     profile.age_group: [age_4_6]
     product.nova_group: { eq: 4 }
   severity: caution
-  score_impact: -20
-  message_key: age.preschool_nova4
-  title: "Hạn chế đồ ăn vặt siêu chế biến"
-  evidence: "Trẻ mầm non nên ăn thực phẩm tươi, ít chế biến"
+  score_impact: -15
+  message_key: age.child_nova4_limit
+  title: "Nên hạn chế thực phẩm chế biến"
+  evidence: "NOVA phản ánh mức độ chế biến, không phải mức độ an toàn; ưu tiên thực phẩm tươi cho bữa chính"
 
 - id: age_4_6_high_sodium
   conditions:
@@ -195,15 +195,16 @@
   title: "Natri cao cho trẻ 6-12 tuổi"
   evidence: "Trẻ em cần hạn chế muối hơn người lớn"
 
+# NOVA cho trẻ 1-6 tuổi đã có rule riêng ở trên; rule này chỉ áp cho trẻ 6-12 để tránh trừ điểm trùng
 - id: young_child_nova4
   conditions:
-    profile.age_group: [age_1_2, age_2_4, age_4_6, age_6_12]
+    profile.age_group: [age_6_12]
     product.nova_group: { eq: 4 }
   severity: caution
   score_impact: -15
-  message_key: age.child_nova4
-  title: "Thực phẩm siêu chế biến"
-  evidence: "Thực phẩm siêu chế biến không phù hợp chế độ ăn trẻ em"
+  message_key: age.child_nova4_limit
+  title: "Nên hạn chế thực phẩm chế biến"
+  evidence: "NOVA phản ánh mức độ chế biến, không phải mức độ an toàn; ưu tiên thực phẩm tươi cho bữa chính"
 
 - id: young_child_instant_noodles
   conditions:
@@ -277,15 +278,17 @@
   evidence: "Tăng cơ nên chọn thực phẩm giàu protein (>10g/100g)"
 
 # General health rules
+# Chỉ áp cho người lớn/thiếu niên/mang thai; trẻ nhỏ đã có rule NOVA riêng để tránh trừ điểm trùng
 - id: nova4_general
   conditions:
     profile.goals: [healthy_eating]
+    profile.age_group: [teen, adult, elderly, pregnant]
     product.nova_group: { eq: 4 }
   severity: caution
-  score_impact: -20
+  score_impact: -15
   message_key: general.nova4
-  title: "Thực phẩm siêu chế biến (NOVA 4)"
-  evidence: "Ăn lành mạnh nên ưu tiên thực phẩm ít chế biến"
+  title: "Mức độ chế biến cao (NOVA 4)"
+  evidence: "NOVA phản ánh mức độ chế biến, không phải mức độ an toàn"
 
 - id: nutri_score_d
   conditions:

@@ -35,3 +35,29 @@ def test_evaluate_ingredients_advice():
     data = response.json()
     assert data["barcode"] == "ocr-upload"
     assert "suitability_score" in data
+
+
+def test_evaluate_ingredients_detects_additives_from_text():
+    client = TestClient(app)
+    body = {
+        "ingredients_text": "bột mì, muối, bột ngọt (E621)",
+        "profile": {"age_group": "adult", "conditions": [], "goals": [], "allergens": []},
+    }
+    data = client.post("/api/v1/advice/evaluate-ingredients", json=body).json()
+    # MSG additive detected -> risk populated + score reduced below base 70
+    assert any(a["e_number"] == "E621" for a in data["additives"])
+    assert any(a["risk_level"] for a in data["additives"])
+    assert data["suitability_score"] < 70
+
+
+def test_evaluate_ingredients_with_quick_nutrients():
+    client = TestClient(app)
+    body = {
+        "ingredients_text": "đường, bột mì",
+        "profile": {"age_group": "adult", "conditions": ["diabetes"], "goals": ["low_sugar"], "allergens": []},
+        "sugars": 25,
+    }
+    data = client.post("/api/v1/advice/evaluate-ingredients", json=body).json()
+    # High sugar + diabetes should trigger warnings and a low score
+    assert data["suitability_score"] < 50
+    assert len(data["warnings"]) > 0

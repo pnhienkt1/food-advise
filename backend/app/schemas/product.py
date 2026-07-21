@@ -116,6 +116,7 @@ class AdviceOut(BaseModel):
     summary: str
     warnings: list[WarningOut]
     positives: list[str] = Field(default_factory=list)
+    additives: list[AdditiveOut] = Field(default_factory=list)
 
 
 class AdviceRequest(BaseModel):
@@ -126,6 +127,13 @@ class AdviceRequest(BaseModel):
 class IngredientsAdviceRequest(BaseModel):
     ingredients_text: str = Field(min_length=2, max_length=10000)
     profile: UserProfile
+    # Số liệu dinh dưỡng tùy chọn (trên 100g/ml) để đánh giá sâu hơn khi không có barcode
+    sugars: float | None = Field(default=None, ge=0)
+    salt: float | None = Field(default=None, ge=0)
+    sodium: float | None = Field(default=None, ge=0)
+    saturated_fat: float | None = Field(default=None, ge=0)
+    energy_kcal: float | None = Field(default=None, ge=0)
+    proteins: float | None = Field(default=None, ge=0)
 
 
 class OcrIngredientsOut(BaseModel):
@@ -150,6 +158,28 @@ class ProductSearchResult(BaseModel):
     image_url: str | None = None
 
     model_config = {"from_attributes": True}
+
+
+class ProductListItem(BaseModel):
+    barcode: str
+    name: str
+    brand: str | None
+    category: str | None
+    source: str
+    source_url: str | None = None
+    image_url: str | None = None
+    nutri_score: str | None = None
+    nova_group: int | None = None
+    ingredients_text: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class ProductListOut(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    items: list[ProductListItem] = Field(default_factory=list)
 
 
 class RecommendationItem(BaseModel):

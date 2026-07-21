@@ -1,4 +1,12 @@
-import type { Advice, OcrIngredientsResult, Product, ProductSearchResult, ProfilePreset, UserProfile } from '../types'
+import type {
+  Advice,
+  OcrIngredientsResult,
+  Product,
+  ProductListResponse,
+  ProductSearchResult,
+  ProfilePreset,
+  UserProfile,
+} from '../types'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
@@ -34,14 +42,42 @@ export function evaluateAdvice(barcode: string, profile: UserProfile): Promise<A
   })
 }
 
+export function listProducts(params: {
+  q?: string
+  ingredient?: string
+  limit?: number
+  offset?: number
+  signal?: AbortSignal
+}): Promise<ProductListResponse> {
+  const search = new URLSearchParams()
+  if (params.q?.trim()) search.set('q', params.q.trim())
+  if (params.ingredient?.trim()) search.set('ingredient', params.ingredient.trim())
+  search.set('limit', String(params.limit ?? 24))
+  search.set('offset', String(params.offset ?? 0))
+  return request(`/api/v1/products?${search.toString()}`, { signal: params.signal })
+}
+
 export function getProfilePresets(): Promise<ProfilePreset[]> {
   return request('/api/v1/profiles/presets')
 }
 
-export function evaluateIngredientsAdvice(ingredientsText: string, profile: UserProfile): Promise<Advice> {
+export interface QuickNutrients {
+  sugars?: number
+  salt?: number
+  sodium?: number
+  saturated_fat?: number
+  energy_kcal?: number
+  proteins?: number
+}
+
+export function evaluateIngredientsAdvice(
+  ingredientsText: string,
+  profile: UserProfile,
+  nutrients?: QuickNutrients,
+): Promise<Advice> {
   return request('/api/v1/advice/evaluate-ingredients', {
     method: 'POST',
-    body: JSON.stringify({ ingredients_text: ingredientsText, profile }),
+    body: JSON.stringify({ ingredients_text: ingredientsText, profile, ...(nutrients ?? {}) }),
   })
 }
 

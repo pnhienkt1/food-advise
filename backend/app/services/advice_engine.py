@@ -3,7 +3,12 @@ from pathlib import Path
 import yaml
 
 from app.schemas.product import ProductOut, UserProfile, WarningOut, WarningSeverity
-from app.services.nlg import MESSAGES, POSITIVE_MESSAGES, SUMMARY_TEMPLATES
+from app.services.nlg import (
+    MESSAGES,
+    POSITIVE_MESSAGES,
+    SUMMARY_TEMPLATES,
+    SUMMARY_TEMPLATES_NO_WARNINGS,
+)
 from app.services.nlg_render import render_template
 
 
@@ -211,7 +216,8 @@ class AdviceEngine:
         summary_key, suitability_label = score_to_label(score, has_danger)
 
         context = {"name": product.name, "score": score}
-        summary = render_template(SUMMARY_TEMPLATES[summary_key], context)
+        summary_templates = SUMMARY_TEMPLATES if warnings else SUMMARY_TEMPLATES_NO_WARNINGS
+        summary = render_template(summary_templates[summary_key], context)
 
         positives = []
         for p in positives_raw:

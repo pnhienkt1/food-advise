@@ -1,0 +1,15 @@
+# Áp dụng cho build có context ở gốc repo (docker-compose dùng context con backend/ frontend/
+# nên đã có .dockerignore riêng trong từng thư mục đó)
+**/node_modules/
+**/.venv/
+venv/
+**/__pycache__/
+*.py[cod]
+**/dist/
+build/
+*.db
+*.sqlite3
+backend/data/
+.env
+*.log
+.git/

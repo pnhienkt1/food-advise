@@ -1,5 +1,5 @@
 import type { Product } from '../types'
-import { SourceBadge } from './ui'
+import { AdditiveBadge, SourceBadge } from './ui'
 
 export function ProductCard({ product }: { product: Product }) {
   return (
@@ -57,9 +57,7 @@ export function ProductCard({ product }: { product: Product }) {
           <h3 className="font-semibold text-slate-800">Phụ gia thực phẩm</h3>
           <div className="mt-1 flex flex-wrap gap-2">
             {product.additives.map((a) => (
-              <span key={a.e_number} className="rounded-md bg-purple-50 px-2 py-1 text-xs text-purple-800">
-                {a.e_number} {a.name && `— ${a.name}`}
-              </span>
+              <AdditiveBadge key={a.e_number} eNumber={a.e_number} name={a.name} risk={a.risk_level} />
             ))}
           </div>
         </div>

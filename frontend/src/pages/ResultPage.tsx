@@ -79,22 +79,42 @@ export function ResultPage() {
       <AdvicePanel advice={advice} />
 
       {alternatives.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h3 className="font-bold text-slate-900">Gợi ý thay thế tốt hơn</h3>
+        <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/60 p-5 shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">✅</span>
+            <h3 className="text-lg font-bold text-emerald-900">Gợi ý thay thế lành mạnh hơn</h3>
+          </div>
+          <p className="mt-1 text-sm text-emerald-800/80">
+            Cùng nhóm sản phẩm nhưng phù hợp hơn với hồ sơ của bạn.
+          </p>
           <ul className="mt-3 space-y-2">
             {alternatives.map((alt) => (
               <li key={alt.barcode}>
                 <Link
                   to={`/result/${alt.barcode}`}
-                  className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 hover:bg-emerald-50"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-white px-4 py-3 shadow-sm transition hover:border-emerald-400 hover:shadow"
                 >
-                  <span className="font-medium text-slate-800">{alt.name}</span>
-                  <div className="flex items-center gap-2">
-                    <SourceBadge source={alt.source} />
-                    {alt.nutri_score && (
-                      <span className="text-xs text-slate-500">NS: {alt.nutri_score.toUpperCase()}</span>
+                  <div className="flex min-w-0 items-center gap-3">
+                    {alt.image_url ? (
+                      <img src={alt.image_url} alt="" className="h-10 w-10 shrink-0 rounded object-contain" />
+                    ) : (
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-emerald-100 text-sm">
+                        🥗
+                      </div>
                     )}
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium text-slate-800">{alt.name}</span>
+                      <span className="mt-0.5 flex items-center gap-2">
+                        <SourceBadge source={alt.source} />
+                        {alt.nutri_score && (
+                          <span className="text-xs text-slate-500">
+                            Nutri-Score {alt.nutri_score.toUpperCase()}
+                          </span>
+                        )}
+                      </span>
+                    </span>
                   </div>
+                  <span className="shrink-0 text-emerald-600">→</span>
                 </Link>
               </li>
             ))}

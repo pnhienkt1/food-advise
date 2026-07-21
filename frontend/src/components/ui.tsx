@@ -25,6 +25,39 @@ export function SourceBadge({ source, url }: { source: string; url?: string | nu
   )
 }
 
+const RISK_STYLES: Record<string, { cls: string; label: string }> = {
+  high: { cls: 'bg-red-50 text-red-800 border-red-200', label: 'Rủi ro cao' },
+  medium: { cls: 'bg-yellow-50 text-yellow-800 border-yellow-200', label: 'Rủi ro trung bình' },
+  low: { cls: 'bg-emerald-50 text-emerald-800 border-emerald-200', label: 'Rủi ro thấp' },
+}
+
+export function AdditiveBadge({
+  eNumber,
+  name,
+  risk,
+}: {
+  eNumber: string
+  name?: string | null
+  risk?: string | null
+}) {
+  const style = (risk && RISK_STYLES[risk.toLowerCase()]) || {
+    cls: 'bg-slate-50 text-slate-700 border-slate-200',
+    label: 'Chưa phân loại',
+  }
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs ${style.cls}`}
+      title={style.label}
+    >
+      <span className="font-semibold">{eNumber}</span>
+      {name && <span>— {name}</span>}
+      <span className="ml-1 rounded-full bg-white/60 px-1.5 py-0.5 text-[10px] font-medium">
+        {style.label}
+      </span>
+    </span>
+  )
+}
+
 export function Disclaimer() {
   return (
     <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

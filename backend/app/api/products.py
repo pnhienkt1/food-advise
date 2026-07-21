@@ -1,14 +1,33 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
-from app.models.product import Product
-from app.schemas.product import AdviceOut, AdviceRequest, ProductOut, ProductSearchResult, UserProfile
+from app.core.database import IS_SQLITE, get_db, strip_diacritics
+from app.models.product import Product, ProductAdditive, ProductIngredient
+from app.schemas.product import (
+    AdviceOut,
+    AdviceRequest,
+    ProductListItem,
+    ProductListOut,
+    ProductOut,
+    ProductSearchResult,
+    UserProfile,
+)
 from app.services.advice_engine import AdviceEngine
 from app.services.product_lookup import ProductLookupService, _product_to_schema
 from app.services.product_search import ProductSearchService
 
 router = APIRouter(prefix="/products", tags=["products"])
+
+
+def _accent_insensitive(column, term: str) -> list:
+    """Build LIKE conditions for `term` on `column`, accent-insensitive on SQLite."""
+    cleaned = term.strip().lower()
+    conditions = [func.lower(column).like(f"%{cleaned}%")]
+    if IS_SQLITE:
+        stripped = strip_diacritics(cleaned)
+        conditions.append(func.unaccent(func.lower(column)).like(f"%{stripped}%"))
+    return conditions
 
 
 @router.get("/search", response_model=list[ProductSearchResult])
@@ -18,6 +37,48 @@ def search_products(
     db: Session = Depends(get_db),
 ):
     return ProductSearchService(db).search(q, limit=limit)
+
+
+@router.get("", response_model=ProductListOut)
+def list_products(
+    q: str | None = Query(None, max_length=200, description="Lọc theo tên/thương hiệu"),
+    ingredient: str | None = Query(None, max_length=200, description="Lọc theo thành phần"),
+    limit: int = Query(24, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Product)
+
+    if q and q.strip():
+        query = query.filter(or_(*_accent_insensitive(Product.name, q), *_accent_insensitive(Product.brand, q)))
+
+    if ingredient and ingredient.strip():
+        matching_ingredients = db.query(ProductIngredient.barcode).filter(
+            or_(*_accent_insensitive(ProductIngredient.normalized_name, ingredient))
+        )
+        # Phụ gia (E-number) được lưu ở bảng riêng nên phải tra cả e_number và tên phụ gia
+        matching_additives = db.query(ProductAdditive.barcode).filter(
+            or_(
+                func.lower(ProductAdditive.e_number).like(f"%{ingredient.strip().lower()}%"),
+                *_accent_insensitive(ProductAdditive.name, ingredient),
+            )
+        )
+        query = query.filter(
+            or_(
+                Product.barcode.in_(matching_ingredients),
+                Product.barcode.in_(matching_additives),
+                *_accent_insensitive(Product.ingredients_text, ingredient),
+            )
+        )
+
+    total = query.count()
+    rows = query.order_by(Product.name).offset(offset).limit(limit).all()
+    return ProductListOut(
+        total=total,
+        limit=limit,
+        offset=offset,
+        items=[ProductListItem.model_validate(row) for row in rows],
+    )
 
 
 @router.get("/{barcode}", response_model=ProductOut)

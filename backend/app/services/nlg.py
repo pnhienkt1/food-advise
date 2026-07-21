@@ -55,6 +55,11 @@ MESSAGES = {
     "age.preschool_nova4": (
         "Nên hạn chế đồ ăn siêu chế biến, ưu tiên thực phẩm tươi cho trẻ."
     ),
+    "age.child_nova4_limit": (
+        "{{ name }} là thực phẩm chế biến dành cho trẻ nhỏ. Có thể dùng như món ăn vặt không "
+        "thường xuyên, nhưng không nên thay thế trái cây tươi hoặc bữa ăn chính. Nếu trẻ ăn "
+        "hằng ngày, nên cân nhắc giảm tần suất."
+    ),
     "age.preschool_sugar": (
         "Đường {{ sugars }}g/100g cao cho trẻ 2-4 tuổi."
     ),
@@ -80,7 +85,9 @@ MESSAGES = {
         "Protein chỉ {{ proteins }}g/100g — thấp cho mục tiêu tăng cơ."
     ),
     "general.nova4": (
-        "{{ name }} là thực phẩm siêu chế biến. Ăn lành mạnh nên ưu tiên thực phẩm tươi, ít chế biến."
+        "{{ name }} có mức độ chế biến cao (NOVA 4). Phù hợp dùng thỉnh thoảng; nên ưu tiên "
+        "thực phẩm tươi, ít chế biến trong bữa ăn hằng ngày. NOVA phản ánh mức độ chế biến, "
+        "không phải mức độ an toàn."
     ),
     "general.nutri_score_low": (
         "Nutri-Score {{ nutri_score | upper }} cho thấy giá trị dinh dưỡng chưa tốt."
@@ -103,6 +110,15 @@ SUMMARY_TEMPLATES = {
     "excellent": "{{ name }} phù hợp tốt với profile sức khỏe của bạn ({{ score }}/100).",
     "good": "{{ name }} khá phù hợp ({{ score }}/100), nhưng hãy lưu ý một số điểm bên dưới.",
     "moderate": "{{ name }} có mức độ phù hợp trung bình ({{ score }}/100). Cân nhắc kỹ trước khi sử dụng thường xuyên.",
+    "poor": "{{ name }} không phù hợp với profile của bạn ({{ score }}/100). Nên tìm sản phẩm thay thế.",
+    "danger": "{{ name }} có cảnh báo nghiêm trọng! Không khuyến khích sử dụng với profile hiện tại.",
+}
+
+# Câu tóm tắt khi KHÔNG có cảnh báo nào — tránh nhắc tới "điểm bên dưới" gây hiểu nhầm
+SUMMARY_TEMPLATES_NO_WARNINGS = {
+    "excellent": "{{ name }} phù hợp tốt với profile sức khỏe của bạn ({{ score }}/100).",
+    "good": "{{ name }} khá phù hợp với profile sức khỏe của bạn ({{ score }}/100), không phát hiện cảnh báo nào.",
+    "moderate": "{{ name }} có mức độ phù hợp trung bình ({{ score }}/100).",
     "poor": "{{ name }} không phù hợp với profile của bạn ({{ score }}/100). Nên tìm sản phẩm thay thế.",
     "danger": "{{ name }} có cảnh báo nghiêm trọng! Không khuyến khích sử dụng với profile hiện tại.",
 }

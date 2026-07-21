@@ -1,0 +1,15 @@
+# Giảm build context (deps sẽ cài lại trong image)
+node_modules/
+dist/
+.vite/
+
+# Môi trường & log
+.env
+*.log
+npm-debug.log*
+
+# VCS & meta
+.git/
+.gitignore
+Dockerfile
+.dockerignore

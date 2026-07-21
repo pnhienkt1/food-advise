@@ -25,6 +25,12 @@ export interface Nutrient {
   label?: string | null
 }
 
+export interface Additive {
+  e_number: string
+  name: string | null
+  risk_level: string | null
+}
+
 export interface Product {
   barcode: string
   name: string
@@ -39,7 +45,7 @@ export interface Product {
   nova_group: number | null
   nutrients: Nutrient[]
   ingredients: { position: number; name: string }[]
-  additives: { e_number: string; name: string | null; risk_level: string | null }[]
+  additives: Additive[]
   alerts: { alert_type: string; message: string; source_url: string | null }[]
 }
 
@@ -59,6 +65,7 @@ export interface Advice {
   summary: string
   warnings: Warning[]
   positives: string[]
+  additives: Additive[]
 }
 
 export interface OcrIngredientsResult {
@@ -66,6 +73,26 @@ export interface OcrIngredientsResult {
   ingredients: string[]
   confidence: number | null
   notes: string | null
+}
+
+export interface ProductListItem {
+  barcode: string
+  name: string
+  brand: string | null
+  category: string | null
+  source: string
+  source_url: string | null
+  image_url: string | null
+  nutri_score: string | null
+  nova_group: number | null
+  ingredients_text: string | null
+}
+
+export interface ProductListResponse {
+  total: number
+  limit: number
+  offset: number
+  items: ProductListItem[]
 }
 
 export interface ProfilePreset {
