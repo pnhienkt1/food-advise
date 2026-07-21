@@ -4,6 +4,7 @@ import { ProfilePage } from './pages/ProfilePage'
 import { ResultPage } from './pages/ResultPage'
 import { RecommendPage } from './pages/RecommendPage'
 import { OcrPage } from './pages/OcrPage'
+import { ProductsPage } from './pages/ProductsPage'
 import { ScanPage } from './pages/ScanPage'
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -18,6 +19,9 @@ function Layout({ children }: { children: React.ReactNode }) {
           <nav className="flex gap-4 text-sm">
             <Link to="/scan" className="text-slate-600 hover:text-emerald-600">
               Quét
+            </Link>
+            <Link to="/products" className="text-slate-600 hover:text-emerald-600">
+              Sản phẩm
             </Link>
             <Link to="/profile" className="text-slate-600 hover:text-emerald-600">
               Hồ sơ
@@ -45,6 +49,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/scan" replace />} />
         <Route path="/scan" element={<ScanPage />} />
+        <Route path="/products" element={<ProductsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/result/:barcode" element={<ResultPage />} />
         <Route path="/recommend" element={<RecommendPage />} />

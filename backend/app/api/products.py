@@ -1,9 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.models.product import Product
-from app.schemas.product import AdviceOut, AdviceRequest, ProductOut, ProductSearchResult, UserProfile
+from app.models.product import Product, ProductIngredient
+from app.schemas.product import (
+    AdviceOut,
+    AdviceRequest,
+    ProductListItem,
+    ProductListOut,
+    ProductOut,
+    ProductSearchResult,
+    UserProfile,
+)
 from app.services.advice_engine import AdviceEngine
 from app.services.product_lookup import ProductLookupService, _product_to_schema
 from app.services.product_search import ProductSearchService
@@ -18,6 +27,42 @@ def search_products(
     db: Session = Depends(get_db),
 ):
     return ProductSearchService(db).search(q, limit=limit)
+
+
+@router.get("", response_model=ProductListOut)
+def list_products(
+    q: str | None = Query(None, max_length=200, description="Lọc theo tên/thương hiệu"),
+    ingredient: str | None = Query(None, max_length=200, description="Lọc theo thành phần"),
+    limit: int = Query(24, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Product)
+
+    if q and q.strip():
+        like = f"%{q.strip()}%"
+        query = query.filter(or_(Product.name.ilike(like), Product.brand.ilike(like)))
+
+    if ingredient and ingredient.strip():
+        ing = f"%{ingredient.strip().lower()}%"
+        matching_barcodes = db.query(ProductIngredient.barcode).filter(
+            func.lower(ProductIngredient.normalized_name).like(ing)
+        )
+        query = query.filter(
+            or_(
+                Product.barcode.in_(matching_barcodes),
+                func.lower(Product.ingredients_text).like(ing),
+            )
+        )
+
+    total = query.count()
+    rows = query.order_by(Product.name).offset(offset).limit(limit).all()
+    return ProductListOut(
+        total=total,
+        limit=limit,
+        offset=offset,
+        items=[ProductListItem.model_validate(row) for row in rows],
+    )
 
 
 @router.get("/{barcode}", response_model=ProductOut)

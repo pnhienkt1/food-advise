@@ -1,4 +1,12 @@
-import type { Advice, OcrIngredientsResult, Product, ProductSearchResult, ProfilePreset, UserProfile } from '../types'
+import type {
+  Advice,
+  OcrIngredientsResult,
+  Product,
+  ProductListResponse,
+  ProductSearchResult,
+  ProfilePreset,
+  UserProfile,
+} from '../types'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
@@ -32,6 +40,21 @@ export function evaluateAdvice(barcode: string, profile: UserProfile): Promise<A
     method: 'POST',
     body: JSON.stringify({ barcode, profile }),
   })
+}
+
+export function listProducts(params: {
+  q?: string
+  ingredient?: string
+  limit?: number
+  offset?: number
+  signal?: AbortSignal
+}): Promise<ProductListResponse> {
+  const search = new URLSearchParams()
+  if (params.q?.trim()) search.set('q', params.q.trim())
+  if (params.ingredient?.trim()) search.set('ingredient', params.ingredient.trim())
+  search.set('limit', String(params.limit ?? 24))
+  search.set('offset', String(params.offset ?? 0))
+  return request(`/api/v1/products?${search.toString()}`, { signal: params.signal })
 }
 
 export function getProfilePresets(): Promise<ProfilePreset[]> {

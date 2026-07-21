@@ -68,6 +68,26 @@ export interface OcrIngredientsResult {
   notes: string | null
 }
 
+export interface ProductListItem {
+  barcode: string
+  name: string
+  brand: string | null
+  category: string | null
+  source: string
+  source_url: string | null
+  image_url: string | null
+  nutri_score: string | null
+  nova_group: number | null
+  ingredients_text: string | null
+}
+
+export interface ProductListResponse {
+  total: number
+  limit: number
+  offset: number
+  items: ProductListItem[]
+}
+
 export interface ProfilePreset {
   id: string
   label: string

@@ -152,6 +152,28 @@ class ProductSearchResult(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class ProductListItem(BaseModel):
+    barcode: str
+    name: str
+    brand: str | None
+    category: str | None
+    source: str
+    source_url: str | None = None
+    image_url: str | None = None
+    nutri_score: str | None = None
+    nova_group: int | None = None
+    ingredients_text: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class ProductListOut(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    items: list[ProductListItem] = Field(default_factory=list)
+
+
 class RecommendationItem(BaseModel):
     barcode: str
     product_name: str
